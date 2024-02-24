@@ -34,8 +34,9 @@ export default function UserProjects({ navigation }: any){
     const { setCurrentProject }: any = useContext(AuthContext)
 
     async function getContent(){
-        setLoader(true)
+        setLoader(false)
         const projects = await api.get('/projects/' + '65bc29cf9f87eda02834a09a')
+        console.log(projects)
         setMyProjects(projects.data.myProjects)
         setOtherProjects(projects.data.otherProjects)
         const invites = await api.get('/getinvites/' + '65bc29cf9f87eda02834a09a')
@@ -49,7 +50,7 @@ export default function UserProjects({ navigation }: any){
 
     if (loader){
         return (
-            <View style={{alignItems: 'center'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                 <Image style={styles.loader} source={require('../../assets/loading.gif')} />
             </View>
         )
