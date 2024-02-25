@@ -3,15 +3,13 @@ import { useState, useEffect, useContext } from "react";
 import api from "../services/api";
 import { Feather } from '@expo/vector-icons'
 import { AuthContext } from "../contexts/auth";
+import { Loader } from "../components/Loader";
 
 interface Project {
     name: string,
     createdBy: object,
-    team: object,
     initialDate: string,
     endDate: string,
-    posts: object,
-    tasks: object,
     finished: boolean,
     createdAt: string
 }
@@ -29,12 +27,12 @@ export default function UserProjects({ navigation }: any){
     const [myProjects, setMyProjects] = useState([])
     const [otherProjects, setOtherProjects] = useState([])
     const [invites, setInvites] = useState([])
-    const [loader, setLoader] = useState(false)
+    const [loader, setLoader] = useState(true)
 
     const { setCurrentProject }: any = useContext(AuthContext)
 
     async function getContent(){
-        setLoader(false)
+        setLoader(true)
         const projects = await api.get('/projects/' + '65bc29cf9f87eda02834a09a')
         console.log(projects)
         setMyProjects(projects.data.myProjects)
@@ -50,9 +48,7 @@ export default function UserProjects({ navigation }: any){
 
     if (loader){
         return (
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                <Image style={styles.loader} source={require('../../assets/loading.gif')} />
-            </View>
+            <Loader />
         )
     }
 
@@ -60,7 +56,7 @@ export default function UserProjects({ navigation }: any){
         <ScrollView>
             <View style={styles.container}>
                 <View>
-                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 24, paddingBottom: 0}}>
+                    <View style={styles.header}>
                         <Text style={{fontSize: 24}}>Bem vindo(a), <Text style={{fontWeight: 'bold'}}>João!</Text></Text>
                         <Feather name="log-out" size={20} />
                     </View>
@@ -73,11 +69,11 @@ export default function UserProjects({ navigation }: any){
                                     <Text onPress={() => {
                                         setCurrentProject(item)
                                         navigation.navigate('team')
-                                    }} style={{fontWeight: 'bold', textAlign: 'center'}}>{(item as Project).name}</Text>
+                                    }} style={styles.projectTitle}>{(item as Project).name}</Text>
                                     <Text>Criado em: {(item as Project).initialDate.slice(0, 10)}</Text>
                                     <Text>Termina em: {(item as Project).endDate.slice(0, 10)}</Text>
                                     <Text>Status: {(item as Project).finished ? 'concluído' : 'em andamento'}</Text>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+                                    <View style={styles.projectBottomButtons}>
                                         <Feather name='trash' size={20} />
                                         <Feather name='check' size={20} />
                                     </View>
@@ -97,11 +93,11 @@ export default function UserProjects({ navigation }: any){
                                     <Text onPress={() => {
                                         setCurrentProject(item)
                                         navigation.navigate('team')
-                                    }} style={{fontWeight: 'bold', textAlign: 'center'}}>{(item as Project).name}</Text>
+                                    }} style={styles.projectTitle}>{(item as Project).name}</Text>
                                     <Text>Criado em: {(item as Project).initialDate.slice(0, 10)}</Text>
                                     <Text>Termina em: {(item as Project).endDate.slice(0, 10)}</Text>
                                     <Text>Status: {(item as Project).finished ? 'concluído' : 'em andamento'}</Text>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+                                    <View style={styles.projectBottomButtons}>
                                         <Feather name='trash' size={20} />
                                         <Feather name='check' size={20} />
                                     </View>
@@ -119,7 +115,7 @@ export default function UserProjects({ navigation }: any){
                             renderItem={({item}) => (
                                 <View style={styles.inviteView}>
                                     <View style={{gap: 16}}>
-                                        <Text style={{fontWeight: 'bold', textAlign: 'center', color: 'white'}}>{(item as Invite).projectName}</Text>
+                                        <Text style={styles.inviteTitle}>{(item as Invite).projectName}</Text>
                                         <Text style={{color: 'white'}}>Convite enviado por: {(item as Invite).inviteFrom}</Text>
                                     </View>
                                     <View style={{gap: 16}}>
@@ -144,6 +140,27 @@ const styles = StyleSheet.create({
         paddingTop: 24,
         paddingBottom: 24
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 24,
+        paddingBottom: 0
+    },
+    title: {
+        fontWeight: 'bold',
+        padding: 24,
+        fontSize: 20
+    },
+    projectTitle: {
+        fontWeight: 'bold',
+        textAlign: 'center'
+    },
+    inviteTitle: {
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: 'white'
+    },
     projectView: {
         backgroundColor: '#F8F1FF',
         width: 200,
@@ -153,10 +170,9 @@ const styles = StyleSheet.create({
         padding: 16,
         gap: 16
     },
-    title: {
-        fontWeight: 'bold',
-        padding: 24,
-        fontSize: 20
+    projectBottomButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
     },
     inviteView: {
         width: 300,
@@ -168,10 +184,5 @@ const styles = StyleSheet.create({
         color: 'white',
         flexDirection: 'row',
         justifyContent: 'space-between'
-    },
-    loader: {
-        width: 50,
-        height: 50,
-        marginTop: 24
     }
 })
